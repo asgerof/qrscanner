@@ -30,7 +30,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, /* verbose= */ false);
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+    const startScanningButton = document.getElementById("start-scanning");
+    startScanningButton.addEventListener("click", () => {
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+      startScanningButton.disabled = true;
+    });
   }
 
   initializeScanner();
