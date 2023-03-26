@@ -2,9 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const qrReader = document.getElementById("qr-reader");
   const result = document.getElementById("result");
 
-  function onScanSuccess(decodedText) {
-    result.textContent = decodedText;
+function onScanSuccess(decodedText) {
+  result.textContent = decodedText;
+
+  const conttypePrefix = "conttype:";
+  if (decodedText.toLowerCase().startsWith(conttypePrefix)) {
+    const contestType = decodedText.slice(conttypePrefix.length).trim();
+    const headerText = document.getElementById("header-text");
+    headerText.textContent = contestType;
   }
+}
 
   function onScanFailure(error) {
     console.warn(`QR code scanning failed: ${error}`);
