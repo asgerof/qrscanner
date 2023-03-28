@@ -6,23 +6,23 @@ document.addEventListener("DOMContentLoaded", function () {
   let contestants = [];
 
   function onScanSuccess(decodedText) {
-    result.textContent = decodedText;
+  result.textContent = decodedText;
 
-    const lowerCaseDecodedText = decodedText.toLowerCase();
+  const lowerCaseDecodedText = decodedText.toLowerCase();
 
-    if (!isScanningContestant) {
-      const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
-      const match = decodedText.match(conttypePattern);
-      if (match) {
-        const contestType = match[1];
-        const contestantAmount = parseInt(match[2]);
+  if (!isScanningContestant) {
+    const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
+    const match = decodedText.match(conttypePattern);
+    if (match) {
+      const contestType = match[1].trim();
+      const contestantAmount = parseInt(match[2]);
 
-        const headerText = document.getElementById("header-text");
-        headerText.textContent = contestType;
+      const headerText = document.getElementById("header-text");
+      headerText.textContent = contestType;
 
-        createContestantLabels(contestantAmount);
-        document.getElementById("add-contestant").disabled = false;
-      }
+      createContestantLabels(contestantAmount);
+      document.getElementById("add-contestant").disabled = false;
+    }
     } else {
       const contestantPrefix = "contestant:";
       if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
