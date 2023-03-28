@@ -101,15 +101,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addContestantName(name) {
-  const availableContestant = contestants.find((contestant) => !contestant.name);
-  if (availableContestant) {
-    availableContestant.labelElement.textContent = name;
-    availableContestant.name = name;
+    const availableContestant = contestants.find((contestant) => !contestant.name);
+    if (availableContestant) {
+      availableContestant.labelElement.textContent = name;
+      availableContestant.name = name;
+    }
   }
-}
-function resetContestantLabel(index) {
-  const contestant = contestants[index - 1];
-  contestant.labelElement.textContent = `Contestant ${index}`;
-  contestant.name = "";
-}
-}
+
+  function resetContestantLabel(index) {
+    const contestant = contestants[index - 1];
+    contestant.labelElement.textContent = `Contestant ${index}`;
+    contestant.name = "";
+  }
+});
