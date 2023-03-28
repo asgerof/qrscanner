@@ -112,3 +112,4 @@ function resetContestantLabel(index) {
   contestant.labelElement.textContent = `Contestant ${index}`;
   contestant.name = "";
 }
+}
