@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const lowerCaseDecodedText = decodedText.toLowerCase();
 
   if (!isScanningContestant) {
-    const conttypePattern = /^conttype:([^;]+);\s*(\d+)$/i;
+    const conttypePattern = /^conttype:\s*([^;]+)\s*;\s*(\d+)$/i;
     const match = decodedText.match(conttypePattern);
     if (match) {
       const contestType = match[1].trim();
