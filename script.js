@@ -113,4 +113,5 @@ document.addEventListener("DOMContentLoaded", function () {
     contestant.labelElement.textContent = `Contestant ${index}`;
     contestant.name = "";
   }
+initializeScanner();
 });
