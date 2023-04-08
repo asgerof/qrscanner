@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 createContestantLabels(contestantAmount);
                 document.getElementById("add-contestant").disabled = false;
+                updateStartContestButton();
             }
         } else {
             const contestantPrefix = "contestant:";
