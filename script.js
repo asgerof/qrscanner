@@ -1,5 +1,6 @@
 let isScanningContestant = false;
 let contestants = [];
+let html5QrcodeScanner;
 
 function onScanSuccess(decodedText) {
   result.textContent = decodedText;
@@ -107,4 +108,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   initializeScanner();
 });
+
+async function getBackCamera() {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const backCamera = devices.find((device) => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
+  return backCamera;
+}
+
+function onScanFailure(error) {
+  console.warn(`QR Code scanning failed: ${error}`);
+}
 
