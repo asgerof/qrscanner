@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("add-contestant").disabled = false;
                 updateStartContestButton();
             }
+            html5QrcodeScanner.clear();
         } else {
             const contestantPrefix = "contestant:";
             if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
