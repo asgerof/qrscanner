@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOMContentLoaded event fired");
     const qrReader = document.getElementById("qr-reader");
     const result = document.getElementById("result");
 
@@ -39,11 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function getBackCamera() {
+        console.log("getBackCamera function started");
         const devices = await navigator.mediaDevices.enumerateDevices();
         return devices.find((device) => device.kind === "videoinput" && device.label.toLowerCase().includes("back"));
+        console.log("getBackCamera function completed");
     }
 
     async function initializeScanner() {
+        console.log("initializeScanner function started");
         const backCamera = await getBackCamera();
         const config = {
             fps: 10,
@@ -70,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isScanningContestant = true;
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         });
+        console.log("initializeScanner function completed");
     }
 
     function createContestantLabels(amount) {
@@ -115,4 +120,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     initializeScanner();
+    console.log("DOMContentLoaded Completed");
 });
