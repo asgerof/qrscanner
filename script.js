@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("DOMContentLoaded event fired");
     const qrReader = document.getElementById("qr-reader");
     const result = document.getElementById("result");
+    const startContestButton = document.getElementById("start-contest");
 
     let isScanningContestant = false;
     let contestants = [];
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (availableContestant) {
             availableContestant.labelElement.textContent = name;
             availableContestant.name = name;
+            updateStartContestButton();
         }
     }
 
@@ -117,7 +119,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const contestant = contestants[index - 1];
         contestant.labelElement.textContent = `Contestant ${index}`;
         contestant.name = "";
+        updateStartContestButton();
     }
+
+    function updateStartContestButton() {
+        const allContestantsAdded = contestants.every((contestant) => contestant.name);
+        startContestButton.disabled = !allContestantsAdded;
+    }
+
 
     initializeScanner();
     console.log("DOMContentLoaded Completed");
