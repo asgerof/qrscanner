@@ -1,37 +1,78 @@
-let isScanningContestant = false;
-let contestants = [];
-let html5QrcodeScanner;
+document.addEventListener("DOMContentLoaded", function () {
+  const qrReader = document.getElementById("qr-reader");
+  const result = document.getElementById("result");
 
-function onScanSuccess(decodedText) {
-  result.textContent = decodedText;
+  let isScanningContestant = false;
+  let contestants = [];
 
-  const lowerCaseDecodedText = decodedText.toLowerCase();
+  function onScanSuccess(decodedText) {
+    result.textContent = decodedText;
 
-  if (!isScanningContestant) {
-    const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
-    const match = decodedText.match(conttypePattern);
-    if (match) {
-      const contestType = match[1];
-      const contestantAmount = parseInt(match[2]);
+    const lowerCaseDecodedText = decodedText.toLowerCase();
 
-      const headerText = document.getElementById("header-text");
-      headerText.textContent = contestType;
+    if (!isScanningContestant) {
+      const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
+      const match = decodedText.match(conttypePattern);
+      if (match) {
+        const contestType = match[1];
+        const contestantAmount = parseInt(match[2]);
 
-      createContestantLabels(contestantAmount);
-      document.getElementById("add-contestant").disabled = false;
+        const headerText = document.getElementById("header-text");
+        headerText.textContent = contestType;
+
+        createContestantLabels(contestantAmount);
+        document.getElementById("add-contestant").disabled = false;
+      }
+    } else {
+      const contestantPrefix = "contestant:";
+      if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
+        const contestantName = decodedText.slice(contestantPrefix.length).trim();
+        addContestantName(contestantName);
+      }
+      isScanningContestant = false;
+      html5QrcodeScanner.clear();
     }
-  } else {
-    const contestantPrefix = "contestant:";
-    if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
-      const contestantName = decodedText.slice(contestantPrefix.length).trim();
-      addContestantName(contestantName);
-    }
-    isScanningContestant = false;
-    html5QrcodeScanner.clear();
   }
-}
 
-function createContestantLabels(amount) {
+  function onScanFailure(error) {
+    console.warn(`QR code scanning failed: ${error}`);
+  }
+
+  async function getBackCamera() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.find((device) => device.kind === "videoinput" && device.label.toLowerCase().includes("back"));
+  }
+
+  async function initializeScanner() {
+    const backCamera = await getBackCamera();
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+    };
+
+    if (backCamera) {
+      config.videoConstraints = {
+        deviceId: backCamera.deviceId,
+        facingMode: "environment",
+      };
+    }
+
+    html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, /* verbose= */ false);
+
+    const startScanningButton = document.getElementById("start-scanning");
+    startScanningButton.addEventListener("click", () => {
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+      startScanningButton.disabled = true;
+    });
+
+    const addContestantButton = document.getElementById("add-contestant");
+    addContestantButton.addEventListener("click", () => {
+      isScanningContestant = true;
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    });
+  }
+
+  function createContestantLabels(amount) {
   const container = document.getElementById("contestants-container");
   container.innerHTML = "";
 
@@ -72,50 +113,3 @@ function resetContestantLabel(index) {
   contestant.labelElement.textContent = `Contestant ${index}`;
   contestant.name = "";
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-  const qrReader = document.getElementById("qr-reader");
-  const result = document.getElementById("result");
-
-  async function initializeScanner() {
-    const backCamera = await getBackCamera();
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-    };
-
-    if (backCamera) {
-      config.videoConstraints = {
-        deviceId: backCamera.deviceId,
-        facingMode: "environment",
-      };
-    }
-
-    html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, /* verbose= */ false);
-
-    const startScanningButton = document.getElementById("start-scanning");
-    startScanningButton.addEventListener("click", () => {
-      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-      startScanningButton.disabled = true;
-    });
-
-    const addContestantButton = document.getElementById("add-contestant");
-    addContestantButton.addEventListener("click", () => {
-      isScanningContestant = true;
-      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    });
-  }
-
-  initializeScanner();
-});
-
-async function getBackCamera() {
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  const backCamera = devices.find((device) => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
-  return backCamera;
-}
-
-function onScanFailure(error) {
-  console.warn(`QR Code scanning failed: ${error}`);
-}
-
