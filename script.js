@@ -73,6 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
             isScanningContestant = true;
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         });
+
+        startContestButton.addEventListener("click", () => {
+            const prompt = "Start a contest with the following contestants: " + contestants.map(c => c.name).join(", ");
+            sendPromptToChatGPT(prompt);
+        });
     }
 
     function createContestantLabels(amount) {
