@@ -129,14 +129,11 @@ document.addEventListener("DOMContentLoaded", function () {
         startContestButton.disabled = !allContestantsAdded;
     }
    
-    async function sendPromptToGPT(prompt) {
-        const responseElement = document.getElementById("gpt-response");
-        responseElement.textContent = "Loading...";
+    async function sendPromptToChatGPT(prompt) {
+        const responseElement = document.getElementById("chatgpt-response");
 
-        const apiUrl = "https://nulni.pythonanywhere.com/chat";
-
-        try {
-            const response = await fetch(apiUrl, {
+        if (prompt) {
+            const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt }),
@@ -148,8 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 responseElement.textContent = 'Error: ' + response.statusText;
             }
-        } catch (error) {
-            responseElement.textContent = 'Error: ' + error;
+        } else {
         }
     }
 
