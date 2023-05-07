@@ -47,6 +47,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function initializeScanner() {
+        // Request permission to use the camera up front
+        try {
+            await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (error) {
+            console.warn(`Failed to get access to the camera: ${error}`);
+            return;
+        }
+
         const backCamera = await getBackCamera();
         const config = {
             fps: 10,
@@ -79,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             sendPromptToChatGPT(prompt);
         });
     }
+
 
     function createContestantLabels(amount) {
         const container = document.getElementById("contestants-container");
