@@ -140,8 +140,12 @@ document.addEventListener("DOMContentLoaded", function () {
    
     async function sendPromptToChatGPT(prompt) {
         const responseElement = document.getElementById("chatgpt-response");
+        const spinnerElement = document.getElementById("loading-spinner");
 
         if (prompt) {
+            // show the loading spinner
+            spinnerElement.style.display = "block";
+
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -154,9 +158,13 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 responseElement.textContent = 'Error: ' + response.statusText;
             }
+
+            // hide the loading spinner
+            spinnerElement.style.display = "none";
         } else {
         }
     }
+
 
     initializeScanner();
 });

@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <!-- Add your CSS file reference here if you have one -->
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
 </head>
 <body>
     <h1 id="header-text">QR Code Scanner</h1>
@@ -17,7 +21,9 @@
     <div id="contestants-container"></div>
 
     <!-- ChatGPT elements -->
+
     <h2>ChatGPT Response</h2>
+    <div id="loading-spinner" style="display:none;">Loading...</div>
     <p id="chatgpt-response"></p>
 
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@latest/dist/html5-qrcode.min.js"></script>
