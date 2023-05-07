@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const qrReader = document.getElementById("qr-reader");
     const result = document.getElementById("result");
     const startContestButton = document.getElementById("start-contest");
+    const contestType;
 
     let isScanningContestant = false;
     let contestants = [];
@@ -15,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
             const match = decodedText.match(conttypePattern);
             if (match) {
-                const contestType = match[1];
+                contestType = match[1];
                 const contestantAmount = parseInt(match[2]);
 
                 const headerText = document.getElementById("header-text");
@@ -83,7 +84,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         startContestButton.addEventListener("click", () => {
-            const prompt = "Start a contest with the following contestants: " + contestants.map(c => c.name).join(", ");
+            const prompt = "Pretend to be ProbabilityBot who estimates probabilities of different scenarios. \n" +
+                "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + ".\n" +
+                "I want you to consider and estimate the probability (0.00 - 1.00 - should total 100%) for each contestant of winning the contest to the best of your abilities.\n" +
+                "Reply in the following JSON format:{\"contestants\": [{ \"C\": \"C1\", \"P\": \"P1\" },{ \"C\": \"C2\", \"P\": \"P2\" },...{ \"C\": \"CN\", \"P\": \"PN\" }]}: ";
             sendPromptToChatGPT(prompt);
         });
     }
