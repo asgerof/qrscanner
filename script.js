@@ -123,7 +123,26 @@ document.addEventListener("DOMContentLoaded", function () {
         const allContestantsAdded = contestants.every((contestant) => contestant.name);
         startContestButton.disabled = !allContestantsAdded;
     }
+   
+    async function sendPromptToChatGPT(prompt) {
+        const responseElement = document.getElementById("chatgpt-response");
 
+        if (prompt) {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                responseElement.textContent = data.response;
+            } else {
+                responseElement.textContent = 'Error: ' + response.statusText;
+            }
+        } else {
+        }
+    }
 
     initializeScanner();
 });
