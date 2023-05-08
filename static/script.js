@@ -88,10 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + ".\n" +
                 "I want you to consider and estimate the probability (0.00 - 1.00 - should total 100%) for each contestant of winning the contest to the best of your abilities.\n" +
                 "Reply in the following JSON format:{\"contestants\": [{ \"C\": \"C1\", \"P\": \"P1\" },{ \"C\": \"C2\", \"P\": \"P2\" },...{ \"C\": \"CN\", \"P\": \"PN\" }]}: ";
-            startContestSequence(prompt);
+            getProbabilitiesFromChatGPT(prompt);
         });
     }
-
 
     function createContestantLabels(amount) {
         const container = document.getElementById("contestants-container");
@@ -141,54 +140,42 @@ document.addEventListener("DOMContentLoaded", function () {
         const allContestantsAdded = contestants.every((contestant) => contestant.name);
         startContestButton.disabled = !allContestantsAdded;
     }
-   
-    async function startContestSequence(prompt) {
+
+    async function getProbabilitiesFromChatGPT(prompt) {
         const responseElement = document.getElementById("chatgpt-response");
         const spinnerElement = document.getElementById("loading-spinner");
-        const winnerElement = document.getElementById("winner");
 
         if (prompt) {
             // show the loading spinner
             spinnerElement.style.display = "block";
 
-            const responseText = await fetchChatGPTResponse(prompt);
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt }),
+            });
 
-            if (responseText) {
-                // Extract JSON string from the response
-                const jsonStart = responseText.indexOf('{');
-                const jsonEnd = responseText.lastIndexOf('}');
-                const jsonString = responseText.slice(jsonStart, jsonEnd + 1);
-
-                try {
-                    // Call the getRandomWinner function and display the result
-                    const winner = getRandomWinner(jsonString);
-                    winnerElement.textContent = "The winner is: " + winner;
-                } catch (error) {
-                    winnerElement.textContent = "Error: " + error.message;
-                }
+            if (response.ok) {
+                const data = await response.json();
+                const jsonString = extractJsonFromString(data.response);
+                const winner = getRandomWinner(jsonString);
+                responseElement.textContent = `The winner is: ${winner}`;
             } else {
-                winnerElement.textContent = 'Error: Failed to get response from ChatGPT.';
+                responseElement.textContent = 'Error: ' + response.statusText;
             }
 
             // hide the loading spinner
             spinnerElement.style.display = "none";
-        } else {
         }
     }
 
-    async function fetchChatGPTResponse(prompt) {
-        const response = await fetch('/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt }),
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            return data.response;
+    function extractJsonFromString(str) {
+        const jsonPattern = /{[\s\S]*}/;
+        const match = str.match(jsonPattern);
+        if (match) {
+            return match[0];
         } else {
-            console.error('Error: ' + response.statusText);
-            return null;
+            throw new Error("Could not find JSON in the response.");
         }
     }
 
@@ -213,10 +200,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 return contestant.C;
             }
         }
-
         // This should never be reached if the total percentage is 1.00.
         throw new Error("Failed to select a random winner.");
     }
 
     initializeScanner();
+
 });

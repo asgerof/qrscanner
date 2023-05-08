@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\static",
+    "\\templates"
   ],
+  "SelectedNode": "\\static\\style.css",
   "PreviewInSolutionExplorer": false
 }
