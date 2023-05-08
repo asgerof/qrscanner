@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const qrReader = document.getElementById("qr-reader");
     const result = document.getElementById("result");
     const startContestButton = document.getElementById("start-contest");
-    const contestType;
 
+    let contestType;
     let isScanningContestant = false;
     let contestants = [];
 
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + ".\n" +
                 "I want you to consider and estimate the probability (0.00 - 1.00 - should total 100%) for each contestant of winning the contest to the best of your abilities.\n" +
                 "Reply in the following JSON format:{\"contestants\": [{ \"C\": \"C1\", \"P\": \"P1\" },{ \"C\": \"C2\", \"P\": \"P2\" },...{ \"C\": \"CN\", \"P\": \"PN\" }]}: ";
-            sendPromptToChatGPT(prompt);
+            startContestSequence(prompt);
         });
     }
 
@@ -142,25 +142,32 @@ document.addEventListener("DOMContentLoaded", function () {
         startContestButton.disabled = !allContestantsAdded;
     }
    
-    async function sendPromptToChatGPT(prompt) {
+    async function startContestSequence(prompt) {
         const responseElement = document.getElementById("chatgpt-response");
         const spinnerElement = document.getElementById("loading-spinner");
+        const winnerElement = document.getElementById("winner");
 
         if (prompt) {
             // show the loading spinner
             spinnerElement.style.display = "block";
 
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt }),
-            });
+            const responseText = await fetchChatGPTResponse(prompt);
 
-            if (response.ok) {
-                const data = await response.json();
-                responseElement.textContent = data.response;
+            if (responseText) {
+                // Extract JSON string from the response
+                const jsonStart = responseText.indexOf('{');
+                const jsonEnd = responseText.lastIndexOf('}');
+                const jsonString = responseText.slice(jsonStart, jsonEnd + 1);
+
+                try {
+                    // Call the getRandomWinner function and display the result
+                    const winner = getRandomWinner(jsonString);
+                    winnerElement.textContent = "The winner is: " + winner;
+                } catch (error) {
+                    winnerElement.textContent = "Error: " + error.message;
+                }
             } else {
-                responseElement.textContent = 'Error: ' + response.statusText;
+                winnerElement.textContent = 'Error: Failed to get response from ChatGPT.';
             }
 
             // hide the loading spinner
@@ -169,6 +176,47 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    async function fetchChatGPTResponse(prompt) {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.response;
+        } else {
+            console.error('Error: ' + response.statusText);
+            return null;
+        }
+    }
+
+    function getRandomWinner(jsonString) {
+        const parsedData = JSON.parse(jsonString);
+        const contestants = parsedData.contestants;
+
+        const totalPercentage = contestants.reduce((accumulator, contestant) => {
+            return accumulator + parseFloat(contestant.P);
+        }, 0);
+
+        if (Math.abs(totalPercentage - 1) > 0.0001) {
+            throw new Error("The total winning percentage should be 1.00.");
+        }
+
+        const randomValue = Math.random() * totalPercentage;
+        let accumulatedPercentage = 0;
+
+        for (const contestant of contestants) {
+            accumulatedPercentage += parseFloat(contestant.P);
+            if (randomValue <= accumulatedPercentage) {
+                return contestant.C;
+            }
+        }
+
+        // This should never be reached if the total percentage is 1.00.
+        throw new Error("Failed to select a random winner.");
+    }
 
     initializeScanner();
 });
