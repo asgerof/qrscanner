@@ -1,3 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    cursor: pointer;
+    margin: 5px;
+}
+
+#header-text {
+    text-align: center;
+}
+
+#qr-reader {
+    margin: 0 auto;
+}
+
+#contestants-container {
+    margin-top: 20px;
+}
+
 #loading-spinner {
   text-align: center;
   margin-top: 10px;

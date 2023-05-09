@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 
@@ -24,7 +21,10 @@
 
     <h2>ChatGPT Response</h2>
     <div id="loading-spinner" style="display:none;">Loading...</div>
-    <p id="chatgpt-response"></p>
+    <p id="chatgpt-response-raw"></p>
+    <p id="chatgpt-response-commentary"></p>
+    <p id="chatgpt-response-winner"></p>
+
 
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@latest/dist/html5-qrcode.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
