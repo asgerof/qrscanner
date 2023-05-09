@@ -165,7 +165,7 @@
                     winnerResponseElement.textContent = `The winner is: ${winner}`;
 
                     // Second request (based on the previous response)
-                    const secondPrompt = `The winner of the previous contest was ${winner}. What are some possible reasons that ${winner} won the contest?`;
+                    const secondPrompt = `Pretend to be a mix between commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Your response should be inside a simple JSON following the format: {"commentary":<your commentary>}`;
                     const secondResponse = await sendChatGPTRequest(secondPrompt);
 
                     // Display the second ChatGPT response
