@@ -165,7 +165,7 @@
                     winnerResponseElement.textContent = `The winner is: ${winner}`;
 
                     // Second request (based on the previous response)
-                    const secondPrompt = `Draw inspiration from commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Without mentioning commentator names, comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Do a very short introduction of the contestants (40 words max, preferably shorter) and then comment the competition as if it was on the radio (150 words max). Your response should be inside a simple JSON with linebreaks and following the format: {"commentary":<your commentary>}`;
+                    const secondPrompt = `Draw inspiration from commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Without mentioning commentator names, comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Do a very short introduction of the contestants (40 words max, preferably shorter) and then comment the competition as if it was on the radio (150 words max). The commentary must contain something comedic. Your response should be inside a simple JSON with linebreaks and following the format: {"commentary":<your commentary>}`;
                     const secondResponse = await sendChatGPTRequest(secondPrompt);
 
                     // Display the second ChatGPT response
