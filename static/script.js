@@ -30,7 +30,7 @@
                 updateStartContestButton();
             } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
                 if (!contestType) {
-                    alert("A Contest Card needs to be scanned before adding contestants.");
+                    alert("A Contest card needs to be scanned before adding contestants.");
                 } else {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
@@ -38,6 +38,7 @@
             }
             html5QrcodeScanner.clear();
         }
+
 
         function onScanFailure(error) {
             console.warn(`QR code scanning failed: ${error}`);
@@ -75,6 +76,7 @@
             const startScanningButton = document.getElementById("start-scanning");
             startScanningButton.addEventListener("click", () => {
                 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                startScanningButton.disabled = true;
             });
 
             const addContestantButton = document.getElementById("add-contestant");
