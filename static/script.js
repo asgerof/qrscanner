@@ -27,7 +27,6 @@
                 headerText.textContent = contestType;
 
                 createContestantLabels(contestantAmount);
-                document.getElementById("start-scanning").disabled = false;
                 updateStartContestButton();
             } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
                 if (!contestType) {
