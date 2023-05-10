@@ -76,7 +76,6 @@
             const startScanningButton = document.getElementById("start-scanning");
             startScanningButton.addEventListener("click", () => {
                 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                startScanningButton.disabled = true;
             });
 
             const addContestantButton = document.getElementById("add-contestant");
