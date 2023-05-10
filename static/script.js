@@ -14,30 +14,30 @@
 
             const lowerCaseDecodedText = decodedText.toLowerCase();
 
-            if (!isScanningContestant) {
-                const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
-                const match = decodedText.match(conttypePattern);
-                if (match) {
-                    contestType = match[1];
-                    const contestantAmount = parseInt(match[2]);
+            const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
+            const contestantPrefix = "contestant:";
 
-                    const headerText = document.getElementById("header-text");
-                    headerText.textContent = contestType;
+            const contestTypeMatch = decodedText.match(conttypePattern);
 
-                    createContestantLabels(contestantAmount);
-                    document.getElementById("add-contestant").disabled = false;
-                    updateStartContestButton();
-                }
-                html5QrcodeScanner.clear();
-            } else {
-                const contestantPrefix = "contestant:";
-                if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
+            if (contestTypeMatch && !contestType) {
+                contestType = contestTypeMatch[1];
+                const contestantAmount = parseInt(contestTypeMatch[2]);
+
+                const headerText = document.getElementById("header-text");
+                headerText.textContent = contestType;
+
+                createContestantLabels(contestantAmount);
+                document.getElementById("start-scanning").disabled = false;
+                updateStartContestButton();
+            } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
+                if (!contestType) {
+                    alert("A Contest card needs to be scanned before adding contestants.");
+                } else {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
                 }
-                isScanningContestant = false;
-                html5QrcodeScanner.clear();
             }
+            html5QrcodeScanner.clear();
         }
 
         function onScanFailure(error) {
