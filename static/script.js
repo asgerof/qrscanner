@@ -78,12 +78,6 @@
                 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
             });
 
-            const addContestantButton = document.getElementById("add-contestant");
-            addContestantButton.addEventListener("click", () => {
-                isScanningContestant = true;
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-            });
-
             startContestButton.addEventListener("click", () => {
                 const prompt = "Pretend to be ProbabilityBot who estimates probabilities of different scenarios. \n" +
                     "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + ".\n" +
