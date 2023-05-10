@@ -5,9 +5,10 @@
         const startContestButton = document.getElementById("start-contest");
 
         let contestType;
-        let isScanningContestant = false;
         let contestants = [];
         let html5QrcodeScanner;
+        let contestEffect;
+
 
         function onScanSuccess(decodedText) {
             result.textContent = decodedText;
@@ -16,6 +17,7 @@
 
             const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
             const contestantPrefix = "contestant:";
+            const effectPrefix = "effect:";
 
             const contestTypeMatch = decodedText.match(conttypePattern);
 
@@ -30,10 +32,17 @@
                 updateStartContestButton();
             } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
                 if (!contestType) {
-                    alert("A Contest card needs to be scanned before adding contestants.");
+                    alert("A Contest Card needs to be scanned before adding contestants.");
                 } else {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
+                }
+            } else if (lowerCaseDecodedText.startsWith(effectPrefix)) {
+                if (!contestType) {
+                    alert("A Contest Card needs to be scanned before adding effects.");
+                } else {
+                    const effectText = decodedText.slice(effectPrefix.length).trim();
+                    contestEffect = effectText;
                 }
             }
             html5QrcodeScanner.clear();
@@ -79,12 +88,19 @@
             });
 
             startContestButton.addEventListener("click", () => {
+                let effectText = "";
+
+                if (contestEffect != "") {
+                    effectText = "This effect is active: " + contestEffect;
+                }
+
                 const prompt = "Pretend to be ProbabilityBot who estimates probabilities of different scenarios. \n" +
-                    "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + ".\n" +
+                    "Consider the following hypothetical scenario: " + contestants.map(c => c.name).join(", ") + " are competing in the discipline: " + contestType + "." + effectText + "\n" +
                     "I want you to consider and estimate the probability (0.00 - 1.00 - should total 100%) for each contestant of winning the contest to the best of your abilities.\n" +
-                    "Reply in the following JSON format:{\"contestants\": [{ \"C\": \"C1\", \"P\": \"P1\" },{ \"C\": \"C2\", \"P\": \"P2\" },...{ \"C\": \"CN\", \"P\": \"PN\" }]}: ";
+                    "Reply in the following JSON format without explanation:{\"contestants\": [{ \"C\": \"C1\", \"P\": \"P1\" },{ \"C\": \"C2\", \"P\": \"P2\" },...{ \"C\": \"CN\", \"P\": \"PN\" }]}: ";
                 getProbabilitiesFromChatGPT(prompt);
             });
+
         }
 
         function createContestantLabels(amount) {
@@ -158,11 +174,11 @@
                     winnerResponseElement.textContent = `The winner is: ${winner}`;
 
                     // Second request (based on the previous response)
-                    const secondPrompt = `Draw inspiration from commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Without mentioning commentator names, comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Do a very short introduction of the contestants (40 words max, preferably shorter) and then comment the competition as if it was on the radio (150 words max). The commentary must contain something comedic. Your response should be inside a simple JSON with linebreaks and following the format: {"commentary":<your commentary>}`;
+                    const secondPrompt = `Draw inspiration from commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Without mentioning commentator names, comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Do a very short introduction of the contestants (40 words max, preferably shorter) and then comment the competition as if it was on the radio (150 words max). The commentary must contain something comedic. The commentary should be enclosed in clamps like this: {<commentary>}`;
                     const secondResponse = await sendChatGPTRequest(secondPrompt);
 
                     // Display the second ChatGPT response
-                    commentaryResponseElement.textContent = `Reasons for ${winner} winning: ${secondResponse}`;
+                    commentaryResponseElement.textContent = `Commentary: ${secondResponse}`;
 
                 } catch (error) {
                     winnerResponseElement.textContent = error.message;
