@@ -35,8 +35,10 @@
                         contestEffect = null;
                     }
                 }
-                //html5QrcodeScanner.clear();
-                //return;
+                // Clear the QR code scanner and keep scanning
+                html5QrcodeScanner.clear();
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                return;
             }
 
             // Handle contest type
