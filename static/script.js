@@ -51,7 +51,7 @@
                     contestEffect = effectText;
                 }
                 else if (effectTarget === "contestant") {
-                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner.stop(); // stop the scanner
                     // Start a new scan session expecting a contestant card
                     html5QrcodeScanner.render((qrCode) => {
                         if (qrCode.toLowerCase().startsWith(contestantPrefix)) {
@@ -62,14 +62,15 @@
                                 targetContestant.effect = effectText;
                             }
                             // Stop scanning after finding a valid contestant
-                            html5QrcodeScanner.clear();
+                            html5QrcodeScanner.stop();
                         }
                     }, onScanFailure);
                 }
             }
 
-            html5QrcodeScanner.clear();
+            html5QrcodeScanner.stop();
         }
+
 
 
 
