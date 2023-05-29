@@ -8,8 +8,8 @@
         let contestants = [];
         let html5QrcodeScanner;
         let contestEffect;
-        let selectingTargetContestantForEffect = false;
-        let currentEffect;
+        let isScanningForEffectTarget = false;
+        let contestEffect;
 
 
         function onScanSuccess(decodedText) {
@@ -32,14 +32,14 @@
 
                 createContestantLabels(contestantAmount);
                 updateStartContestButton();
+            } else if (!selectingTargetContestantForEffect && lowerCaseDecodedText.startsWith(contestantPrefix) && !contestType) {
+                alert("A Contest Card needs to be scanned before adding contestants.");
             } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
-                if (isScanningForEffectTarget) {
+                if (selectingTargetContestantForEffect) {
                     const targetName = decodedText.slice(contestantPrefix.length).trim();
-                    contestEffect = contestEffect.replace('<contestant>', targetName);
-                    isScanningForEffectTarget = false;
-                } else if (!contestType) {
-                    alert("A Contest Card needs to be scanned before adding contestants.");
-                } else {
+                    currentEffect = currentEffect.replace('<contestant>', targetName);
+                    selectingTargetContestantForEffect = false;
+                } else if (contestType) {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
                 }
@@ -48,22 +48,29 @@
                     alert("A Contest Card needs to be scanned before adding effects.");
                 } else {
                     const effectMatch = decodedText.match(effectPattern);
-                    const effectText = effectMatch[1].trim();
+                    currentEffect = effectMatch[1].trim();
                     const effectTarget = effectMatch[2].trim();
 
                     if (effectTarget.toLowerCase() === 'contestant') {
-                        contestEffect = effectText;
-                        isScanningForEffectTarget = true;
-                        alert('Please scan a contestant to apply the effect.');
-                    } else if (effectTarget.toLowerCase() === 'contest') {
-                        contestEffect = effectText;
-                    } else {
+                        selectingTargetContestantForEffect = true;
+                    } else if (effectTarget.toLowerCase() !== 'contest') {
                         console.error('Invalid effect target:', effectTarget);
                     }
                 }
             }
+
             html5QrcodeScanner.clear();
+
+            if (selectingTargetContestantForEffect) {
+                html5QrcodeScanner.render().then(_ => {
+                    // Scanner ready to scan.
+                }).catch(error => {
+                    console.error(error);
+                });
+            }
         }
+
+
 
 
 
