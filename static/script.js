@@ -35,14 +35,6 @@
                         contestEffect = null;
                     }
                 }
-                html5QrcodeScanner.clear();
-                if (scanState === "awaitingContestantForEffect") {
-                    // If still awaiting a contestant, continue scanning
-                    setTimeout(() => {
-                        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                    }, 1000); // Start the scanner again after 1 second
-                }
-                return;
             }
 
             // Handle contest type
