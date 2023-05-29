@@ -79,7 +79,9 @@
                 }
             }
 
-            html5QrcodeScanner.clear();
+            if (scanState != "awaitingContestantForEffect") {
+                html5QrcodeScanner.clear();
+            }
         }
 
         function onScanFailure(error) {
