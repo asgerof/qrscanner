@@ -38,7 +38,9 @@
                 html5QrcodeScanner.clear();
                 if (scanState === "awaitingContestantForEffect") {
                     // If still awaiting a contestant, continue scanning
-                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    setTimeout(() => {
+                        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    }, 1000); // Start the scanner again after 1 second
                 }
                 return;
             }
@@ -71,7 +73,9 @@
                 else if (effectTarget === "contestant") {
                     contestEffect = effectText;
                     scanState = "awaitingContestantForEffect";
-                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    setTimeout(() => {
+                        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    }, 1000); // Start the scanner again after 1 second
                 }
             }
 
