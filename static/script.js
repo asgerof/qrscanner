@@ -51,6 +51,7 @@
                     contestEffect = effectText;
                 }
                 else if (effectTarget === "contestant") {
+                    html5QrcodeScanner.clear();
                     // Start a new scan session expecting a contestant card
                     html5QrcodeScanner.render((qrCode) => {
                         if (qrCode.toLowerCase().startsWith(contestantPrefix)) {
