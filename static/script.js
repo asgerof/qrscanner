@@ -10,9 +10,9 @@
         let contestEffect;
         let isScanningForEffectTarget = false;
 
+        let scanState = "idle";
 
         function onScanSuccess(qrCodeMessage) {
-
             result.textContent = qrCodeMessage;
 
             // Patterns
@@ -24,6 +24,19 @@
             let parsedContestType = qrCodeMessage.match(conttypePattern);
             let isContestant = qrCodeMessage.toLowerCase().startsWith(contestantPrefix);
             let parsedEffect = qrCodeMessage.match(effectPattern);
+
+            if (scanState === "awaitingContestantForEffect") {
+                if (isContestant) {
+                    let targetContestantName = qrCodeMessage.slice(contestantPrefix.length);
+                    let targetContestant = contestants.find(c => c.name === targetContestantName);
+                    if (targetContestant) {
+                        targetContestant.effect = contestEffect;
+                        scanState = "idle";
+                        contestEffect = null;
+                    }
+                }
+                return;
+            }
 
             // Handle contest type
             if (parsedContestType) {
@@ -51,28 +64,13 @@
                     contestEffect = effectText;
                 }
                 else if (effectTarget === "contestant") {
-                    html5QrcodeScanner.stop(); // stop the scanner
-                    // Start a new scan session expecting a contestant card
-                    html5QrcodeScanner.render((qrCode) => {
-                        if (qrCode.toLowerCase().startsWith(contestantPrefix)) {
-                            let targetContestantName = qrCode.slice(contestantPrefix.length);
-                            let targetContestant = contestants.find(c => c.name === targetContestantName);
-                            if (targetContestant) {
-                                // Store the effect text for the target contestant
-                                targetContestant.effect = effectText;
-                            }
-                            // Stop scanning after finding a valid contestant
-                            html5QrcodeScanner.stop();
-                        }
-                    }, onScanFailure);
+                    contestEffect = effectText;
+                    scanState = "awaitingContestantForEffect";
                 }
             }
 
-            html5QrcodeScanner.stop();
+            html5QrcodeScanner.clear();
         }
-
-
-
 
 
         function onScanFailure(error) {
