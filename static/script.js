@@ -34,47 +34,44 @@
                         scanState = "idle";
                         contestEffect = null;
                     }
+                    // Clear the QR code scanner and keep scanning
+                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    return;
                 }
-                // Clear the QR code scanner and keep scanning
-                html5QrcodeScanner.clear();
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                return;
             }
 
-            // Handle contest type
+            // If the scanState is not "awaitingContestantForEffect", handle the other types of QR code
             if (parsedContestType) {
                 let contestTitle = parsedContestType[1];
                 let contestantCount = parseInt(parsedContestType[2]);
                 document.getElementById("header-text").textContent = contestTitle;
                 contestType = contestTitle;
                 createContestantLabels(contestantCount);
-            }
-            // Handle contestant
-            else if (isContestant) {
+            } else if (isContestant) {
                 if (!contestType) {
                     alert("A Contest Card needs to be scanned before adding contestants.");
                 } else {
                     let contestantName = qrCodeMessage.slice(contestantPrefix.length);
                     addContestantName(contestantName);
                 }
-            }
-            // Handle effect
-            else if (parsedEffect) {
+            } else if (parsedEffect) {
                 let effectText = parsedEffect[1];
                 let effectTarget = parsedEffect[2];
 
                 if (effectTarget === "contest") {
                     contestEffect = effectText;
-                }
-                else if (effectTarget === "contestant") {
+                } else if (effectTarget === "contestant") {
                     contestEffect = effectText;
                     scanState = "awaitingContestantForEffect";
+                    html5QrcodeScanner.clear();
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                 }
             }
 
             html5QrcodeScanner.clear();
         }
+
 
 
         function onScanFailure(error) {
