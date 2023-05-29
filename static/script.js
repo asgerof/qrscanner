@@ -9,7 +9,6 @@
         let html5QrcodeScanner;
         let contestEffect;
         let isScanningForEffectTarget = false;
-        let contestEffect;
 
 
         function onScanSuccess(qrCodeMessage) {
