@@ -8,62 +8,64 @@
         let contestants = [];
         let html5QrcodeScanner;
         let contestEffect;
-        let selectingTargetContestantForEffect = false;
-        let currentEffect;
+        let isScanningForEffectTarget = false;
+        let contestEffect;
 
 
-        function onScanSuccess(decodedText) {
-            result.textContent = decodedText;
-
-            const lowerCaseDecodedText = decodedText.toLowerCase();
-
+        function onScanSuccess(qrCodeMessage) {
+            // Patterns
             const conttypePattern = /^conttype:\s*([^;]+):\s*(\d+)$/i;
             const contestantPrefix = "contestant:";
             const effectPattern = /^effect:(.*):(.*)$/i;
 
-            const contestTypeMatch = decodedText.match(conttypePattern);
+            // Parse the message based on patterns
+            let parsedContestType = qrCodeMessage.match(conttypePattern);
+            let isContestant = qrCodeMessage.toLowerCase().startsWith(contestantPrefix);
+            let parsedEffect = qrCodeMessage.match(effectPattern);
 
-            if (contestTypeMatch && !contestType) {
-                contestType = contestTypeMatch[1];
-                const contestantAmount = parseInt(contestTypeMatch[2]);
-
-                const headerText = document.getElementById("header-text");
-                headerText.textContent = contestType;
-
-                createContestantLabels(contestantAmount);
-                updateStartContestButton();
-            } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
-                if (isScanningForEffectTarget) {
-                    const targetName = decodedText.slice(contestantPrefix.length).trim();
-                    contestEffect = contestEffect.replace('<contestant>', targetName);
-                    isScanningForEffectTarget = false;
-                } else if (!contestType) {
+            // Handle contest type
+            if (parsedContestType) {
+                let contestTitle = parsedContestType[1];
+                let contestantCount = parseInt(parsedContestType[2]);
+                document.getElementById("header-text").textContent = contestTitle;
+                contestType = contestTitle;
+                createContestantLabels(contestantCount);
+            }
+            // Handle contestant
+            else if (isContestant) {
+                if (!contestType) {
                     alert("A Contest Card needs to be scanned before adding contestants.");
                 } else {
-                    const contestantName = decodedText.slice(contestantPrefix.length).trim();
+                    let contestantName = qrCodeMessage.slice(contestantPrefix.length);
                     addContestantName(contestantName);
                 }
-            } else if (effectPattern.test(lowerCaseDecodedText)) {
-                if (!contestType) {
-                    alert("A Contest Card needs to be scanned before adding effects.");
-                } else {
-                    const effectMatch = decodedText.match(effectPattern);
-                    const effectText = effectMatch[1].trim();
-                    const effectTarget = effectMatch[2].trim();
+            }
+            // Handle effect
+            else if (parsedEffect) {
+                let effectText = parsedEffect[1];
+                let effectTarget = parsedEffect[2];
 
-                    if (effectTarget.toLowerCase() === 'contestant') {
-                        contestEffect = effectText;
-                        isScanningForEffectTarget = true;
-                        alert('Please scan a contestant to apply the effect.');
-                    } else if (effectTarget.toLowerCase() === 'contest') {
-                        contestEffect = effectText;
-                    } else {
-                        console.error('Invalid effect target:', effectTarget);
-                    }
+                if (effectTarget === "contest") {
+                    contestEffect = effectText;
+                }
+                else if (effectTarget === "contestant") {
+                    // Start a new scan session expecting a contestant card
+                    html5QrcodeScanner.render((qrCode) => {
+                        if (qrCode.toLowerCase().startsWith(contestantPrefix)) {
+                            let targetContestantName = qrCode.slice(contestantPrefix.length);
+                            let targetContestant = contestants.find(c => c.name === targetContestantName);
+                            if (targetContestant) {
+                                // Store the effect text for the target contestant
+                                targetContestant.effect = effectText;
+                            }
+                            // Stop scanning after finding a valid contestant
+                            html5QrcodeScanner.clear();
+                        }
+                    }, onScanFailure);
                 }
             }
-            html5QrcodeScanner.clear();
         }
+
 
 
 
