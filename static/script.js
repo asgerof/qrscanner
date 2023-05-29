@@ -35,8 +35,8 @@
                         contestEffect = null;
                     }
                 }
-                html5QrcodeScanner.clear();
-                return;
+                //html5QrcodeScanner.clear();
+                //return;
             }
 
             // Handle contest type
