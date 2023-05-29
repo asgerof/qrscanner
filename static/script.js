@@ -13,7 +13,7 @@
 
         function onScanSuccess(qrCodeMessage) {
 
-            result.textContent = decodedText;
+            result.textContent = qrCodeMessage;
 
             // Patterns
             const conttypePattern = /^conttype:\s*([^;]+):\s*(\d+)$/i;
@@ -67,7 +67,7 @@
                 }
             }
 
-            
+            html5QrcodeScanner.clear();
         }
 
 
