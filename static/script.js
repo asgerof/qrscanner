@@ -35,8 +35,7 @@
                         contestEffect = null;
                     }
                 }
-                // Start a new scan again
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                html5QrcodeScanner.clear();
                 return;
             }
 
@@ -68,13 +67,13 @@
                 else if (effectTarget === "contestant") {
                     contestEffect = effectText;
                     scanState = "awaitingContestantForEffect";
-                    // Start a new scan expecting a contestant card
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                 }
             }
 
             html5QrcodeScanner.clear();
         }
+
 
         function onScanFailure(error) {
             console.warn(`QR code scanning failed: ${error}`);
