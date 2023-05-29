@@ -32,14 +32,10 @@
 
                 createContestantLabels(contestantAmount);
                 updateStartContestButton();
-            } else if (!selectingTargetContestantForEffect && lowerCaseDecodedText.startsWith(contestantPrefix) && !contestType) {
-                alert("A Contest Card needs to be scanned before adding contestants.");
-            } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
-                if (selectingTargetContestantForEffect) {
-                    const targetName = decodedText.slice(contestantPrefix.length).trim();
-                    currentEffect = currentEffect.replace('<contestant>', targetName);
-                    selectingTargetContestantForEffect = false;
-                } else if (contestType) {
+            } else if (lowerCaseDecodedText.startsWith(contestantPrefix) && !selectingTargetContestantForEffect) {
+                if (!contestType) {
+                    alert("A Contest Card needs to be scanned before adding contestants.");
+                } else {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
                 }
@@ -53,25 +49,23 @@
 
                     if (effectTarget.toLowerCase() === 'contestant') {
                         selectingTargetContestantForEffect = true;
-                    } else if (effectTarget.toLowerCase() !== 'contest') {
+                        alert('Please scan a contestant to apply the effect.');
+                    } else if (effectTarget.toLowerCase() === 'contest') {
+                        // Here, the effect applies to the whole contest
+                        // No need to scan a new contestant in this case
+                        // so we just store the effect and keep going
+                        selectingTargetContestantForEffect = false;
+                    } else {
                         console.error('Invalid effect target:', effectTarget);
                     }
                 }
+            } else if (selectingTargetContestantForEffect && lowerCaseDecodedText.startsWith(contestantPrefix)) {
+                const targetName = decodedText.slice(contestantPrefix.length).trim();
+                currentEffect = currentEffect.replace('<contestant>', targetName);
+                selectingTargetContestantForEffect = false;
             }
-
             html5QrcodeScanner.clear();
-
-            if (selectingTargetContestantForEffect) {
-                html5QrcodeScanner.render().then(_ => {
-                    // Scanner ready to scan.
-                }).catch(error => {
-                    console.error(error);
-                });
-            }
         }
-
-
-
 
 
         function onScanFailure(error) {
