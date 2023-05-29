@@ -8,6 +8,8 @@
         let contestants = [];
         let html5QrcodeScanner;
         let contestEffect;
+        let selectingTargetContestantForEffect = false;
+        let currentEffect;
 
 
         function onScanSuccess(decodedText) {
@@ -15,9 +17,9 @@
 
             const lowerCaseDecodedText = decodedText.toLowerCase();
 
-            const conttypePattern = /^conttype:\s*([^;]+);\s*(\d+)$/i;
+            const conttypePattern = /^conttype:\s*([^;]+):\s*(\d+)$/i;
             const contestantPrefix = "contestant:";
-            const effectPrefix = "effect:";
+            const effectPattern = /^effect:(.*):(.*)$/i;
 
             const contestTypeMatch = decodedText.match(conttypePattern);
 
@@ -31,22 +33,38 @@
                 createContestantLabels(contestantAmount);
                 updateStartContestButton();
             } else if (lowerCaseDecodedText.startsWith(contestantPrefix)) {
-                if (!contestType) {
+                if (isScanningForEffectTarget) {
+                    const targetName = decodedText.slice(contestantPrefix.length).trim();
+                    contestEffect = contestEffect.replace('<contestant>', targetName);
+                    isScanningForEffectTarget = false;
+                } else if (!contestType) {
                     alert("A Contest Card needs to be scanned before adding contestants.");
                 } else {
                     const contestantName = decodedText.slice(contestantPrefix.length).trim();
                     addContestantName(contestantName);
                 }
-            } else if (lowerCaseDecodedText.startsWith(effectPrefix)) {
+            } else if (effectPattern.test(lowerCaseDecodedText)) {
                 if (!contestType) {
                     alert("A Contest Card needs to be scanned before adding effects.");
                 } else {
-                    const effectText = decodedText.slice(effectPrefix.length).trim();
-                    contestEffect = effectText;
+                    const effectMatch = decodedText.match(effectPattern);
+                    const effectText = effectMatch[1].trim();
+                    const effectTarget = effectMatch[2].trim();
+
+                    if (effectTarget.toLowerCase() === 'contestant') {
+                        contestEffect = effectText;
+                        isScanningForEffectTarget = true;
+                        alert('Please scan a contestant to apply the effect.');
+                    } else if (effectTarget.toLowerCase() === 'contest') {
+                        contestEffect = effectText;
+                    } else {
+                        console.error('Invalid effect target:', effectTarget);
+                    }
                 }
             }
             html5QrcodeScanner.clear();
         }
+
 
 
         function onScanFailure(error) {
@@ -174,7 +192,7 @@
                     winnerResponseElement.textContent = `The winner is: ${winner}`;
 
                     // Second request (based on the previous response)
-                    const secondPrompt = `Draw inspiration from commentators Andy Gray, John Motson, Martin Taylor, Lance Russel and Peter O'Sullevan. Without mentioning commentator names, comment on this competition between  ${contestants.map(c => c.name).join(", ")}. They are competing in the discipline: ${contestType}. The winner of the competition must be: ${winner}. Do a very short introduction of the contestants (40 words max, preferably shorter) and then comment the competition as if it was on the radio (150 words max). The commentary must contain something comedic. The commentary should be enclosed in clamps like this: {<commentary>}`;
+                    const secondPrompt = `Imagine a radio competition between ${contestants.map(c => c.name).join(", ")} in the discipline: ${contestType}. The predetermined winner is ${winner}. First, briefly introduce each contestant in less than 40 words total. Then, provide a humorous radio commentary of the competition in less than 150 words. Ensure the commentary is enclosed within brackets like this: {<commentary>}.`;
                     const secondResponse = await sendChatGPTRequest(secondPrompt);
 
                     // Display the second ChatGPT response
