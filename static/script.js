@@ -12,6 +12,9 @@
 
 
         function onScanSuccess(qrCodeMessage) {
+
+            result.textContent = decodedText;
+
             // Patterns
             const conttypePattern = /^conttype:\s*([^;]+):\s*(\d+)$/i;
             const contestantPrefix = "contestant:";
@@ -63,6 +66,8 @@
                     }, onScanFailure);
                 }
             }
+
+            html5QrcodeScanner.clear();
         }
 
 
