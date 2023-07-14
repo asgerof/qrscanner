@@ -198,7 +198,7 @@
                     winnerResponseElement.textContent = `The winner is: ${winner}`;
 
                     // Second request (based on the previous response)
-                    const secondPrompt = `Imagine a radio competition between ${contestants.map(c => c.name).join(", ")} in the discipline: ${contestType}. The predetermined winner is ${winner}. First, briefly introduce each contestant in less than 40 words total. Then, provide a humorous radio commentary of the competition in less than 150 words. Ensure the commentary is enclosed within brackets like this: {<commentary>}.`;
+                    const secondPrompt = `Imagine a competition between ${contestants.map(c => c.name).join(", ")} in the discipline: ${contestType}. The predetermined winner is ${winner}. First, briefly introduce each contestant in less than 40 words total. Then, provide a humorous commentary of the competition in less than 150 words. The commentary should be in JSON format.`;
                     const secondResponse = await sendChatGPTRequest(secondPrompt);
 
                     // Display the second ChatGPT response
